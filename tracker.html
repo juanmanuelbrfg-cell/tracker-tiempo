@@ -2,8 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Tracker de tiempo diario</title>
+
+  <!-- iOS "web app" hints -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0b1020">
+
   <style>
     :root{
       --bg:#0b1020; --card:#111a33; --card2:#0f1730; --text:#e9eefc; --muted:#aeb8da;
@@ -23,7 +29,7 @@
                   var(--bg);
       min-height:100vh;
     }
-    .wrap{max-width:1100px; margin:0 auto; padding:22px 18px 40px}
+    .wrap{max-width:1120px; margin:0 auto; padding:22px 18px 40px}
     header{
       display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
       padding:10px 6px 18px;
@@ -35,8 +41,25 @@
       background: rgba(255,255,255,.06); border:1px solid var(--line);
       padding:10px 12px; border-radius:999px;
       box-shadow: 0 8px 18px rgba(0,0,0,.2);
+      flex-wrap:wrap;
     }
     .pill .date{font-family:var(--mono); font-size:12px; color:var(--muted)}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      font-size:12px; color:var(--muted);
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+    }
     .grid{
       display:grid; grid-template-columns: 1.15fr .85fr; gap:16px;
     }
@@ -57,9 +80,7 @@
     .card .hd h2{margin:0; font-size:14px; letter-spacing:.3px; text-transform:uppercase; color:var(--muted)}
     .card .bd{padding:16px}
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    input, select, button{
-      font-family:inherit; color:var(--text);
-    }
+    input, select, button{font-family:inherit; color:var(--text)}
     input, select{
       background: rgba(0,0,0,.18);
       border:1px solid var(--line);
@@ -92,12 +113,11 @@
       background: linear-gradient(180deg, rgba(54,211,153,.22), rgba(54,211,153,.10));
       border-color: rgba(54,211,153,.35);
     }
-    button:disabled{
-      opacity:.55; cursor:not-allowed; transform:none;
-    }
+    button:disabled{opacity:.55; cursor:not-allowed; transform:none}
+    .hint{font-size:12px; color:var(--muted); margin-top:8px}
     .split{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
     @media (max-width:560px){ .split{grid-template-columns:1fr} }
-    .hint{font-size:12px; color:var(--muted); margin-top:8px}
+
     .timerBox{
       display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
       padding:14px 16px; border-radius:16px;
@@ -115,26 +135,12 @@
       box-shadow: 0 0 0 4px rgba(54,211,153,.16);
       animation: pulse 1.2s ease-in-out infinite;
     }
-    @keyframes pulse{
-      0%,100%{transform: scale(1)}
-      50%{transform: scale(1.12)}
-    }
+    @keyframes pulse{0%,100%{transform: scale(1)}50%{transform: scale(1.12)}}
     .timerMeta{display:flex; flex-direction:column; gap:2px}
     .timerMeta .task{font-weight:600}
     .timerMeta .proj{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px}
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:4px 10px; border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.05);
-      font-size:12px; color:var(--muted);
-    }
     .swatch{width:10px; height:10px; border-radius:4px; display:inline-block}
-    .chrono{
-      font-family: var(--mono);
-      font-size: 22px;
-      letter-spacing: .6px;
-    }
+    .chrono{font-family: var(--mono); font-size: 22px; letter-spacing: .6px;}
     .table{
       width:100%;
       border-collapse: collapse;
@@ -154,10 +160,8 @@
     .table tr:last-child td{border-bottom:none}
     .right{text-align:right}
     .mini{font-size:12px; color:var(--muted)}
-    .actions{display:flex; gap:8px; justify-content:flex-end}
-    .kpi{
-      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
-    }
+    .actions{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
+    .kpi{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
     @media (max-width:560px){ .kpi{grid-template-columns:1fr} }
     .kpi .box{
       padding:14px 14px;
@@ -209,17 +213,17 @@
       backdrop-filter: blur(10px);
     }
     .toast.show{opacity:1; transform: translateY(0)}
-    .kbd{
-      font-family: var(--mono);
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
+    .weekGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
     }
+    @media (max-width:960px){ .weekGrid{grid-template-columns:1fr} }
+    .chipBtn{padding:8px 10px; min-height:36px}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
@@ -227,14 +231,16 @@
         <h1>Tracker de tiempo diario</h1>
         <p>Proyectos, tareas y registros por día. Datos guardados localmente en tu navegador.</p>
       </div>
+
       <div class="pill">
-        <span class="date" id="today"></span>
+        <span class="date" id="todayPretty"></span>
         <span class="badge"><span class="kbd">Espacio</span> iniciar/detener</span>
+        <span class="badge"><span class="kbd">Excel</span> CSV “;”</span>
       </div>
     </header>
 
     <div class="grid">
-      <!-- LEFT: tracking + entries -->
+      <!-- LEFT -->
       <section class="card">
         <div class="hd">
           <h2>Control diario</h2>
@@ -242,7 +248,28 @@
             <span class="badge" id="dayKeyBadge">Día</span>
           </div>
         </div>
+
         <div class="bd">
+          <!-- Day selector -->
+          <div class="row" style="justify-content:space-between; align-items:flex-end; margin-bottom:12px">
+            <div style="min-width:240px; flex:1">
+              <div class="mini">Día (histórico)</div>
+              <div class="row" style="margin-top:6px">
+                <button class="chipBtn" id="prevDayBtn">←</button>
+                <button class="chipBtn" id="todayBtn">Hoy</button>
+                <button class="chipBtn" id="nextDayBtn">→</button>
+                <input id="dayPicker" type="date" style="flex:1; min-width:180px" />
+              </div>
+              <div class="hint" id="dayHint">Puedes revisar y exportar cualquier día. La tarea activa siempre pertenece al día actual.</div>
+            </div>
+
+            <div class="footerActions">
+              <button id="exportDayBtn">Exportar CSV (día)</button>
+              <button id="exportWeekBtn">Exportar CSV (semana)</button>
+            </div>
+          </div>
+
+          <!-- Active -->
           <div class="timerBox" style="margin-bottom:14px">
             <div class="timerLeft">
               <div class="dot" id="liveDot" title="Estado"></div>
@@ -260,6 +287,7 @@
             </div>
           </div>
 
+          <!-- Inputs -->
           <div class="split">
             <div>
               <label class="mini">Proyecto</label><br/>
@@ -277,20 +305,23 @@
             <span class="hint">Atajo: <span class="kbd">Espacio</span> (si hay tarea activa, detiene; si no, inicia).</span>
           </div>
 
+          <!-- Entries -->
           <div style="margin-top:16px">
             <div class="row" style="justify-content:space-between; align-items:flex-end">
               <div>
-                <div style="font-weight:700; margin-bottom:4px">Registros de hoy</div>
+                <div style="font-weight:700; margin-bottom:4px">Registros del día seleccionado</div>
                 <div class="mini" id="entriesCount">0 entradas</div>
               </div>
               <div class="footerActions">
-                <button id="exportBtn">Exportar CSV</button>
-                <button class="danger" id="clearBtn">Limpiar día</button>
+                <button id="backupBtn">Backup JSON</button>
+                <button id="importBtn">Import JSON</button>
+                <button class="danger" id="clearDayBtn">Limpiar día</button>
+                <input id="importFile" type="file" accept="application/json" style="display:none" />
               </div>
             </div>
 
             <div style="margin-top:10px; overflow:auto">
-              <table class="table" id="entriesTable">
+              <table class="table">
                 <thead>
                   <tr>
                     <th>Proyecto</th>
@@ -301,16 +332,14 @@
                     <th class="right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody id="entriesTbody">
-                  <!-- rows -->
-                </tbody>
+                <tbody id="entriesTbody"></tbody>
               </table>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- RIGHT: projects + summary -->
+      <!-- RIGHT -->
       <aside class="card">
         <div class="hd">
           <h2>Proyectos y resumen</h2>
@@ -318,13 +347,14 @@
             <span class="badge" id="storageBadge">Local</span>
           </div>
         </div>
+
         <div class="bd">
           <div class="row" style="margin-bottom:10px">
             <input id="newProjectName" placeholder="Nuevo proyecto (ej: LATAM Reporting)" style="flex:1; min-width:220px" />
             <button class="primary" id="addProjectBtn">+ Añadir</button>
           </div>
           <div class="hint" style="margin-bottom:14px">
-            Los colores se asignan automáticamente y se mantienen. Puedes borrar un proyecto si no tiene entradas.
+            Los colores se asignan automáticamente y se mantienen. Puede borrar un proyecto si no tiene entradas en ningún día.
           </div>
 
           <div class="list" id="projectsList"></div>
@@ -332,20 +362,48 @@
           <div style="margin-top:16px">
             <div class="kpi">
               <div class="box">
-                <div class="label">Total hoy</div>
-                <div class="value" id="totalToday">00:00:00</div>
+                <div class="label">Total día seleccionado</div>
+                <div class="value" id="totalSelectedDay">00:00:00</div>
               </div>
               <div class="box">
-                <div class="label">Entradas</div>
+                <div class="label">Entradas día seleccionado</div>
                 <div class="value" id="totalEntries">0</div>
               </div>
             </div>
 
             <div style="margin-top:14px">
-              <div style="font-weight:700; margin-bottom:6px">Desglose por proyecto</div>
-              <div class="hint" style="margin-top:0; margin-bottom:10px">Se calcula a partir de las entradas del día (incluye la tarea activa en tiempo real).</div>
-              <div id="breakdown"></div>
+              <div style="font-weight:700; margin-bottom:6px">Desglose por proyecto (día)</div>
+              <div class="hint" style="margin-top:0; margin-bottom:10px">Incluye la tarea activa solo si estás viendo “Hoy”.</div>
+              <div id="breakdownDay"></div>
             </div>
+
+            <div style="margin-top:18px">
+              <div style="font-weight:800; margin-bottom:6px">Resumen semanal (Lunes–Domingo)</div>
+              <div class="hint" style="margin-top:0; margin-bottom:10px">Semana de la fecha seleccionada. Totales por día y por proyecto.</div>
+
+              <div class="kpi" style="margin-bottom:10px">
+                <div class="box">
+                  <div class="label">Total semana</div>
+                  <div class="value" id="totalWeek">00:00:00</div>
+                </div>
+                <div class="box">
+                  <div class="label">Rango</div>
+                  <div class="value" id="weekRange" style="font-size:14px; line-height:1.2; font-family:var(--mono)"></div>
+                </div>
+              </div>
+
+              <div class="weekGrid">
+                <div class="box">
+                  <div class="label">Totales por día</div>
+                  <div id="weekByDay" style="margin-top:10px"></div>
+                </div>
+                <div class="box">
+                  <div class="label">Desglose por proyecto</div>
+                  <div id="weekByProject" style="margin-top:10px"></div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </aside>
@@ -358,7 +416,6 @@
 (() => {
   // ===== Helpers =====
   const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   const pad = (n) => String(n).padStart(2,'0');
 
@@ -384,9 +441,28 @@
     return `${y}-${m}-${day}`;
   }
 
+  function parseDateKey(key){
+    // key: YYYY-MM-DD in local time
+    const [y,m,d] = key.split('-').map(Number);
+    return new Date(y, (m-1), d, 0,0,0,0);
+  }
+
+  function addDays(dateKey, delta){
+    const d = parseDateKey(dateKey);
+    d.setDate(d.getDate() + delta);
+    return fmtDateKey(d);
+  }
+
+  function escHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
   function safeCSV(v){
     const s = String(v ?? '');
-    if(/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    // Excel ES (;) -> still needs quote escaping
+    if(/[;"\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
     return s;
   }
 
@@ -398,21 +474,13 @@
     toast._timer = setTimeout(()=>t.classList.remove('show'), 2600);
   }
 
-  // ===== Storage Keys =====
-  const DAY_KEY = fmtDateKey(new Date());
-  const LS_KEY = 'daily_time_tracker_v1';
+  function uid(){
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+  }
+
+  // ===== Storage =====
+  const LS_KEY = 'daily_time_tracker_v2';
   const LS_DAY_PREFIX = 'daily_time_tracker_day_';
-
-  // ===== State =====
-  /** @type {{
-    projects: Array<{id:string,name:string,color:string,createdAt:number}>,
-    lastColorIndex: number,
-    active: null | { entryId: string, startedAt: number },
-  }} */
-  let app = loadApp();
-
-  /** @type {{ entries: Array<any> }} */
-  let day = loadDay(DAY_KEY);
 
   // ===== Colors =====
   const COLOR_POOL = [
@@ -428,9 +496,62 @@
     return COLOR_POOL[idx];
   }
 
-  function uid(){
-    return Math.random().toString(16).slice(2) + Date.now().toString(16);
-  }
+  // ===== App state =====
+  let app = loadApp();
+  ensureDefaultProject();
+
+  const TODAY_KEY = fmtDateKey(new Date());
+  let selectedDayKey = TODAY_KEY;
+  let selectedDay = loadDay(selectedDayKey);
+
+  // ===== DOM =====
+  const todayPretty = $('#todayPretty');
+  const dayKeyBadge = $('#dayKeyBadge');
+  const dayPicker = $('#dayPicker');
+  const prevDayBtn = $('#prevDayBtn');
+  const nextDayBtn = $('#nextDayBtn');
+  const todayBtn = $('#todayBtn');
+  const dayHint = $('#dayHint');
+
+  const projectSelect = $('#projectSelect');
+  const taskInput = $('#taskInput');
+  const startBtn = $('#startBtn');
+  const stopBtn = $('#stopBtn');
+  const chronoEl = $('#chrono');
+  const activeTaskLabel = $('#activeTaskLabel');
+  const activeProjectText = $('#activeProjectText');
+  const activeSince = $('#activeSince');
+  const liveDot = $('#liveDot');
+  const activeSwatch = $('#activeSwatch');
+
+  const entriesTbody = $('#entriesTbody');
+  const entriesCount = $('#entriesCount');
+
+  const newProjectName = $('#newProjectName');
+  const addProjectBtn = $('#addProjectBtn');
+  const projectsList = $('#projectsList');
+
+  const totalSelectedDay = $('#totalSelectedDay');
+  const totalEntries = $('#totalEntries');
+  const breakdownDay = $('#breakdownDay');
+  const storageBadge = $('#storageBadge');
+
+  const exportDayBtn = $('#exportDayBtn');
+  const exportWeekBtn = $('#exportWeekBtn');
+  const clearDayBtn = $('#clearDayBtn');
+  const backupBtn = $('#backupBtn');
+  const importBtn = $('#importBtn');
+  const importFile = $('#importFile');
+
+  const totalWeek = $('#totalWeek');
+  const weekRange = $('#weekRange');
+  const weekByDay = $('#weekByDay');
+  const weekByProject = $('#weekByProject');
+
+  // ===== Init header =====
+  const now = new Date();
+  todayPretty.textContent = now.toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  storageBadge.textContent = 'Guardado: localStorage';
 
   // ===== Load/Save =====
   function loadApp(){
@@ -446,7 +567,6 @@
         }
       }
     }catch(e){}
-    // default
     const base = { projects: [], lastColorIndex: 0, active: null };
     localStorage.setItem(LS_KEY, JSON.stringify(base));
     return base;
@@ -472,58 +592,22 @@
     return base;
   }
 
-  function saveDay(dayKey=DAY_KEY){
-    localStorage.setItem(LS_DAY_PREFIX + dayKey, JSON.stringify(day));
+  function saveSelectedDay(){
+    localStorage.setItem(LS_DAY_PREFIX + selectedDayKey, JSON.stringify(selectedDay));
   }
 
-  // ===== Migration / guard rails =====
   function ensureDefaultProject(){
     if(app.projects.length === 0){
-      const p = { id: uid(), name: 'General', color: nextColor(), createdAt: Date.now() };
-      app.projects.push(p);
+      app.projects.push({ id: uid(), name: 'General', color: nextColor(), createdAt: Date.now() });
       saveApp();
     }
   }
 
-  ensureDefaultProject();
+  // ===== Projects =====
+  function getProject(id){
+    return app.projects.find(p => p.id === id) || null;
+  }
 
-  // ===== DOM refs =====
-  const todayEl = $('#today');
-  const dayKeyBadge = $('#dayKeyBadge');
-  const projectSelect = $('#projectSelect');
-  const taskInput = $('#taskInput');
-  const startBtn = $('#startBtn');
-  const stopBtn = $('#stopBtn');
-  const chronoEl = $('#chrono');
-  const activeTaskLabel = $('#activeTaskLabel');
-  const activeProjectText = $('#activeProjectText');
-  const activeSince = $('#activeSince');
-  const liveDot = $('#liveDot');
-  const activeSwatch = $('#activeSwatch');
-
-  const entriesTbody = $('#entriesTbody');
-  const entriesCount = $('#entriesCount');
-
-  const newProjectName = $('#newProjectName');
-  const addProjectBtn = $('#addProjectBtn');
-  const projectsList = $('#projectsList');
-
-  const totalToday = $('#totalToday');
-  const totalEntries = $('#totalEntries');
-  const breakdownEl = $('#breakdown');
-
-  const exportBtn = $('#exportBtn');
-  const clearBtn = $('#clearBtn');
-  const storageBadge = $('#storageBadge');
-
-  // ===== Date header =====
-  const now = new Date();
-  const pretty = now.toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  todayEl.textContent = pretty;
-  dayKeyBadge.textContent = `Día: ${DAY_KEY}`;
-  storageBadge.textContent = `Guardado: localStorage`;
-
-  // ===== Projects UI =====
   function renderProjects(){
     // select
     projectSelect.innerHTML = '';
@@ -533,40 +617,40 @@
       opt.textContent = p.name;
       projectSelect.appendChild(opt);
     }
+    if(!app.projects.find(p => p.id === projectSelect.value)){
+      projectSelect.value = app.projects[0]?.id ?? '';
+    }
 
     // list
     projectsList.innerHTML = '';
+    const usedAnywhere = getAllDayKeys().some(k => {
+      const d = loadDay(k);
+      return d.entries.some(e => e.projectId === undefined ? false : e.projectId === undefined);
+    });
+
     for(const p of app.projects){
+      const usedInAnyDay = getAllDayKeys().some(k => {
+        const d = loadDay(k);
+        return d.entries.some(e => e.projectId === p.id);
+      }) || (getActiveEntry()?.projectId === p.id);
+
       const it = document.createElement('div');
       it.className = 'item';
-      const used = day.entries.some(e => e.projectId === p.id) || (getActiveEntry()?.projectId === p.id);
-
       it.innerHTML = `
         <div class="lhs">
           <div class="name">
             <span class="swatch" style="background:${p.color}"></span>
-            <span>${escapeHtml(p.name)}</span>
+            <span>${escHtml(p.name)}</span>
           </div>
-          <div class="sub">${used ? 'En uso hoy' : 'Sin entradas hoy'}</div>
+          <div class="sub">${usedInAnyDay ? 'En uso en el histórico' : 'Sin entradas'}</div>
         </div>
         <div class="actions">
           <button data-act="rename" data-id="${p.id}">Renombrar</button>
-          <button class="danger" data-act="delete" data-id="${p.id}" ${used ? 'disabled title="No se puede borrar: proyecto en uso hoy"' : ''}>Borrar</button>
+          <button class="danger" data-act="delete" data-id="${p.id}" ${usedInAnyDay || app.projects.length<=1 ? 'disabled' : ''} title="${usedInAnyDay ? 'No se puede borrar: tiene entradas' : (app.projects.length<=1?'Debe existir al menos 1 proyecto':'')}">Borrar</button>
         </div>
       `;
       projectsList.appendChild(it);
     }
-
-    // ensure selected is valid
-    if(!app.projects.find(p=>p.id===projectSelect.value)){
-      projectSelect.value = app.projects[0]?.id ?? '';
-    }
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
   }
 
   projectsList.addEventListener('click', (e) => {
@@ -574,7 +658,7 @@
     if(!btn) return;
     const id = btn.getAttribute('data-id');
     const act = btn.getAttribute('data-act');
-    const p = app.projects.find(x=>x.id===id);
+    const p = app.projects.find(x => x.id === id);
     if(!p) return;
 
     if(act === 'rename'){
@@ -589,14 +673,14 @@
     }
 
     if(act === 'delete'){
-      const used = day.entries.some(e => e.projectId === p.id) || (getActiveEntry()?.projectId === p.id);
-      if(used) return;
-      if(app.projects.length <= 1){
-        toast('Debe existir al menos 1 proyecto');
-        return;
-      }
+      if(app.projects.length <= 1) return;
+      const usedInAnyDay = getAllDayKeys().some(k => {
+        const d = loadDay(k);
+        return d.entries.some(e => e.projectId === p.id);
+      }) || (getActiveEntry()?.projectId === p.id);
+      if(usedInAnyDay) return;
       if(confirm(`¿Borrar proyecto "${p.name}"?`)){
-        app.projects = app.projects.filter(x=>x.id!==p.id);
+        app.projects = app.projects.filter(x => x.id !== p.id);
         saveApp();
         renderAll();
         toast('Proyecto borrado');
@@ -606,7 +690,7 @@
 
   addProjectBtn.addEventListener('click', () => {
     const name = (newProjectName.value || '').trim();
-    if(!name){ toast('Indica un nombre de proyecto'); return; }
+    if(!name){ toast('Indique un nombre de proyecto'); return; }
     if(app.projects.some(p => p.name.toLowerCase() === name.toLowerCase())){
       toast('Ya existe un proyecto con ese nombre');
       return;
@@ -624,15 +708,12 @@
     if(e.key === 'Enter') addProjectBtn.click();
   });
 
-  // ===== Entries =====
-  function getProject(id){
-    return app.projects.find(p => p.id === id) || null;
-  }
-
+  // ===== Active entry (belongs to TODAY only) =====
   function getActiveEntry(){
     if(!app.active) return null;
     const id = app.active.entryId;
-    const e = day.entries.find(x => x.id === id);
+    const today = loadDay(TODAY_KEY);
+    const e = today.entries.find(x => x.id === id);
     return e || null;
   }
 
@@ -646,30 +727,53 @@
     return Math.max(0, end - entry.startedAt);
   }
 
+  // ===== Day selector =====
+  function setSelectedDay(dayKey){
+    selectedDayKey = dayKey;
+    selectedDay = loadDay(selectedDayKey);
+    dayPicker.value = selectedDayKey;
+    dayKeyBadge.textContent = `Día: ${selectedDayKey}`;
+    dayHint.textContent = (selectedDayKey === TODAY_KEY)
+      ? 'Estás en “Hoy”. El resumen incluye la tarea activa en tiempo real.'
+      : 'Estás viendo un día del histórico. La tarea activa (si existe) pertenece a “Hoy”.';
+    renderAll();
+  }
+
+  dayPicker.addEventListener('change', () => {
+    if(!dayPicker.value) return;
+    setSelectedDay(dayPicker.value);
+  });
+
+  prevDayBtn.addEventListener('click', () => setSelectedDay(addDays(selectedDayKey, -1)));
+  nextDayBtn.addEventListener('click', () => setSelectedDay(addDays(selectedDayKey, +1)));
+  todayBtn.addEventListener('click', () => setSelectedDay(TODAY_KEY));
+
+  // ===== Entries render =====
   function renderEntries(){
     entriesTbody.innerHTML = '';
 
-    // sort by startedAt desc (latest first)
-    const entries = [...day.entries].sort((a,b) => b.startedAt - a.startedAt);
+    const entries = [...selectedDay.entries].sort((a,b) => b.startedAt - a.startedAt);
 
     for(const e of entries){
       const p = getProject(e.projectId);
-      const durMs = computeEntryDurationMs(e);
+      const includeLive = (selectedDayKey === TODAY_KEY);
+      const durMs = computeEntryDurationMs(e, includeLive ? Date.now() : (e.endedAt ?? e.startedAt));
       const tr = document.createElement('tr');
 
       tr.innerHTML = `
         <td>
           <span class="badge">
             <span class="swatch" style="background:${p?.color ?? 'transparent'}"></span>
-            ${escapeHtml(p?.name ?? '—')}
+            ${escHtml(p?.name ?? '—')}
           </span>
         </td>
-        <td>${escapeHtml(e.task || '')}${(!e.endedAt ? ' <span class="badge">ACTIVA</span>' : '')}</td>
+        <td>${escHtml(e.task || '')}${(!e.endedAt ? ' <span class="badge">ACTIVA</span>' : '')}</td>
         <td class="mini">${fmtTime(e.startedAt)}</td>
         <td class="mini">${e.endedAt ? fmtTime(e.endedAt) : '—'}</td>
         <td class="right" style="font-family:var(--mono)">${fmtHMS(durMs)}</td>
         <td class="right">
           <div class="actions">
+            <button data-edit="${e.id}">Editar</button>
             <button class="danger" data-del="${e.id}">Eliminar</button>
           </div>
         </td>
@@ -677,27 +781,109 @@
       entriesTbody.appendChild(tr);
     }
 
-    entriesCount.textContent = `${day.entries.length} ${day.entries.length===1?'entrada':'entradas'}`;
-    totalEntries.textContent = String(day.entries.length);
+    entriesCount.textContent = `${selectedDay.entries.length} ${selectedDay.entries.length===1?'entrada':'entradas'}`;
+    totalEntries.textContent = String(selectedDay.entries.length);
   }
 
+  // Edit / Delete handlers
   entriesTbody.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-del]');
-    if(!btn) return;
-    const id = btn.getAttribute('data-del');
-    const entry = day.entries.find(x => x.id === id);
-    if(!entry) return;
+    const del = e.target.closest('button[data-del]');
+    const edit = e.target.closest('button[data-edit]');
 
-    // If deleting active entry, stop it first implicitly
-    if(app.active?.entryId === id){
-      app.active = null;
-      saveApp();
+    if(del){
+      const id = del.getAttribute('data-del');
+      const entry = selectedDay.entries.find(x => x.id === id);
+      if(!entry) return;
+
+      // If deleting active in TODAY
+      if(selectedDayKey === TODAY_KEY && app.active?.entryId === id){
+        app.active = null;
+        saveApp();
+      }
+      selectedDay.entries = selectedDay.entries.filter(x => x.id !== id);
+      saveSelectedDay();
+      renderAll();
+      toast('Entrada eliminada');
+      return;
     }
-    day.entries = day.entries.filter(x => x.id !== id);
-    saveDay();
-    renderAll();
-    toast('Entrada eliminada');
+
+    if(edit){
+      const id = edit.getAttribute('data-edit');
+      const entry = selectedDay.entries.find(x => x.id === id);
+      if(!entry) return;
+
+      // Minimal edit via prompts (simple, robust)
+      const p = getProject(entry.projectId);
+      const newTask = prompt('Tarea:', entry.task ?? '');
+      if(newTask === null) return;
+
+      // project choose: show simple list
+      const projList = app.projects.map(pp => `${pp.name}`).join(', ');
+      const newProjName = prompt(`Proyecto (escriba exactamente el nombre). Opciones: ${projList}`, p?.name ?? '');
+      if(newProjName === null) return;
+
+      const newProj = app.projects.find(pp => pp.name.toLowerCase() === newProjName.trim().toLowerCase());
+      if(!newProj){
+        toast('Proyecto no encontrado (revise el nombre exacto).');
+        return;
+      }
+
+      const startHHMM = prompt('Inicio (HH:MM):', toHHMM(entry.startedAt));
+      if(startHHMM === null) return;
+
+      const endHHMM = prompt('Fin (HH:MM) — deje vacío para “en curso”:', entry.endedAt ? toHHMM(entry.endedAt) : '');
+      if(endHHMM === null) return;
+
+      const baseDate = parseDateKey(selectedDayKey);
+      const newStart = hhmmToTs(baseDate, startHHMM.trim());
+      if(newStart === null){ toast('Formato inicio inválido. Use HH:MM'); return; }
+
+      let newEnd = null;
+      const endStr = endHHMM.trim();
+      if(endStr){
+        newEnd = hhmmToTs(baseDate, endStr);
+        if(newEnd === null){ toast('Formato fin inválido. Use HH:MM'); return; }
+        if(newEnd < newStart){ toast('Fin no puede ser antes de inicio'); return; }
+      }
+
+      entry.task = newTask.trim();
+      entry.projectId = newProj.id;
+      entry.startedAt = newStart;
+      entry.endedAt = newEnd;
+
+      // If edited entry is active, keep active only if TODAY and still no endedAt
+      if(selectedDayKey === TODAY_KEY){
+        if(entry.endedAt){
+          if(app.active?.entryId === entry.id){
+            app.active = null;
+            saveApp();
+          }
+        }else{
+          // ensure active points to it
+          app.active = { entryId: entry.id, startedAt: entry.startedAt };
+          saveApp();
+        }
+      }
+
+      saveSelectedDay();
+      renderAll();
+      toast('Entrada actualizada');
+    }
   });
+
+  function toHHMM(ts){
+    const d = new Date(ts);
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function hhmmToTs(baseDate, hhmm){
+    const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(hhmm);
+    if(!m) return null;
+    const h = Number(m[1]);
+    const min = Number(m[2]);
+    const d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), h, min, 0, 0);
+    return d.getTime();
+  }
 
   // ===== Active UI =====
   function renderActive(){
@@ -711,6 +897,7 @@
       activeSwatch.style.border = 'none';
       activeSince.textContent = `Desde ${fmtTime(ae.startedAt)}`;
       stopBtn.disabled = false;
+      startBtn.disabled = false; // allow start? No, we disable start if running
       startBtn.disabled = true;
       projectSelect.disabled = true;
       taskInput.disabled = true;
@@ -729,58 +916,7 @@
     }
   }
 
-  // ===== Summary =====
-  function computeTotals(){
-    const nowTs = Date.now();
-    const totalsByProject = new Map(); // projectId -> ms
-    let totalMs = 0;
-
-    for(const e of day.entries){
-      const ms = computeEntryDurationMs(e, nowTs);
-      totalMs += ms;
-      totalsByProject.set(e.projectId, (totalsByProject.get(e.projectId)||0) + ms);
-    }
-
-    return { totalMs, totalsByProject };
-  }
-
-  function renderSummary(){
-    const { totalMs, totalsByProject } = computeTotals();
-    totalToday.textContent = fmtHMS(totalMs);
-
-    // breakdown sorted desc by ms
-    const rows = [...totalsByProject.entries()]
-      .map(([pid,ms]) => ({ pid, ms }))
-      .sort((a,b)=> b.ms - a.ms);
-
-    breakdownEl.innerHTML = '';
-
-    if(rows.length === 0){
-      breakdownEl.innerHTML = `<div class="hint">Sin datos todavía. Inicia una tarea para generar el desglose.</div>`;
-      return;
-    }
-
-    for(const r of rows){
-      const p = getProject(r.pid);
-      const pct = totalMs > 0 ? (r.ms/totalMs)*100 : 0;
-
-      const wrap = document.createElement('div');
-      wrap.style.marginBottom = '10px';
-      wrap.innerHTML = `
-        <div class="row" style="justify-content:space-between; margin-bottom:6px">
-          <div class="badge">
-            <span class="swatch" style="background:${p?.color ?? 'transparent'}"></span>
-            <span>${escapeHtml(p?.name ?? '—')}</span>
-          </div>
-          <div style="font-family:var(--mono)">${fmtHMS(r.ms)}</div>
-        </div>
-        <div class="bar"><div style="width:${pct.toFixed(1)}%; background:${p?.color ?? '#999'}"></div></div>
-      `;
-      breakdownEl.appendChild(wrap);
-    }
-  }
-
-  // ===== Start/Stop =====
+  // ===== Start/Stop (always in TODAY) =====
   function startTask(){
     if(isRunning()){
       toast('Ya hay una tarea activa');
@@ -788,23 +924,20 @@
     }
     const projectId = projectSelect.value;
     const task = (taskInput.value || '').trim();
-    if(!projectId){
-      toast('Crea o selecciona un proyecto');
-      return;
-    }
+    if(!projectId){ toast('Cree o seleccione un proyecto'); return; }
 
-    const entry = {
-      id: uid(),
-      projectId,
-      task,
-      startedAt: Date.now(),
-      endedAt: null
-    };
+    const today = loadDay(TODAY_KEY);
+    const entry = { id: uid(), projectId, task, startedAt: Date.now(), endedAt: null };
+    today.entries.push(entry);
+    localStorage.setItem(LS_DAY_PREFIX + TODAY_KEY, JSON.stringify(today));
 
-    day.entries.push(entry);
     app.active = { entryId: entry.id, startedAt: entry.startedAt };
-    saveDay();
     saveApp();
+
+    // If user is viewing TODAY, refresh selectedDay in-memory
+    if(selectedDayKey === TODAY_KEY){
+      selectedDay = loadDay(TODAY_KEY);
+    }
     renderAll();
     toast('Tarea iniciada');
   }
@@ -816,17 +949,30 @@
       return;
     }
     ae.endedAt = Date.now();
+
+    // persist today
+    const today = loadDay(TODAY_KEY);
+    const idx = today.entries.findIndex(x => x.id === ae.id);
+    if(idx >= 0){
+      today.entries[idx] = ae;
+      localStorage.setItem(LS_DAY_PREFIX + TODAY_KEY, JSON.stringify(today));
+    }
+
     app.active = null;
-    saveDay();
     saveApp();
+
+    if(selectedDayKey === TODAY_KEY){
+      selectedDay = loadDay(TODAY_KEY);
+    }
+
     renderAll();
     toast('Tarea detenida');
   }
 
-  startBtn.addEventListener('click', startTask);
-  stopBtn.addEventListener('click', stopTask);
+  $('#startBtn').addEventListener('click', startTask);
+  $('#stopBtn').addEventListener('click', stopTask);
 
-  // spacebar toggle (avoid when typing in inputs)
+  // Spacebar toggle (avoid typing)
   window.addEventListener('keydown', (e) => {
     const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
     const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select';
@@ -838,120 +984,397 @@
     }
   });
 
-  // ===== Export CSV =====
-  exportBtn.addEventListener('click', () => {
-    if(day.entries.length === 0){
-      toast('No hay entradas para exportar');
+  // ===== Totals (day) =====
+  function computeDayTotals(dayKey, dayObj){
+    const nowTs = Date.now();
+    const totalsByProject = new Map();
+    let totalMs = 0;
+
+    for(const e of dayObj.entries){
+      const live = (dayKey === TODAY_KEY);
+      const ms = computeEntryDurationMs(e, live ? nowTs : (e.endedAt ?? e.startedAt));
+      totalMs += ms;
+      totalsByProject.set(e.projectId, (totalsByProject.get(e.projectId)||0) + ms);
+    }
+    return { totalMs, totalsByProject };
+  }
+
+  function renderDaySummary(){
+    const { totalMs, totalsByProject } = computeDayTotals(selectedDayKey, selectedDay);
+    totalSelectedDay.textContent = fmtHMS(totalMs);
+
+    const rows = [...totalsByProject.entries()]
+      .map(([pid,ms]) => ({ pid, ms }))
+      .sort((a,b)=> b.ms - a.ms);
+
+    breakdownDay.innerHTML = '';
+    if(rows.length === 0){
+      breakdownDay.innerHTML = `<div class="hint">Sin datos todavía en este día.</div>`;
       return;
     }
-    const nowTs = Date.now();
+
+    for(const r of rows){
+      const p = getProject(r.pid);
+      const pct = totalMs > 0 ? (r.ms/totalMs)*100 : 0;
+      const wrap = document.createElement('div');
+      wrap.style.marginBottom = '10px';
+      wrap.innerHTML = `
+        <div class="row" style="justify-content:space-between; margin-bottom:6px">
+          <div class="badge">
+            <span class="swatch" style="background:${p?.color ?? 'transparent'}"></span>
+            <span>${escHtml(p?.name ?? '—')}</span>
+          </div>
+          <div style="font-family:var(--mono)">${fmtHMS(r.ms)}</div>
+        </div>
+        <div class="bar"><div style="width:${pct.toFixed(1)}%; background:${p?.color ?? '#999'}"></div></div>
+      `;
+      breakdownDay.appendChild(wrap);
+    }
+  }
+
+  // ===== Week (Monday start) =====
+  function getWeekKeysFrom(dayKey){
+    const d = parseDateKey(dayKey);
+    // JS: 0=Sun,1=Mon,... ; we want Monday as start
+    const dow = d.getDay();
+    const deltaToMon = (dow === 0) ? -6 : (1 - dow);
+    const mon = new Date(d);
+    mon.setDate(mon.getDate() + deltaToMon);
+
+    const keys = [];
+    for(let i=0;i<7;i++){
+      const x = new Date(mon);
+      x.setDate(mon.getDate() + i);
+      keys.push(fmtDateKey(x));
+    }
+    return keys;
+  }
+
+  function computeWeek(){
+    const keys = getWeekKeysFrom(selectedDayKey);
+    const byDay = []; // {key, ms}
+    const byProject = new Map();
+    let totalMs = 0;
+
+    for(const k of keys){
+      const d = (k === selectedDayKey) ? selectedDay : loadDay(k);
+      const { totalMs: dayMs, totalsByProject } = computeDayTotals(k, d);
+      byDay.push({ key: k, ms: dayMs });
+      totalMs += dayMs;
+      for(const [pid, ms] of totalsByProject.entries()){
+        byProject.set(pid, (byProject.get(pid)||0) + ms);
+      }
+    }
+    return { keys, byDay, byProject, totalMs };
+  }
+
+  function renderWeek(){
+    const { keys, byDay, byProject, totalMs } = computeWeek();
+    totalWeek.textContent = fmtHMS(totalMs);
+    weekRange.textContent = `${keys[0]}  →  ${keys[6]}`;
+
+    // by day list
+    weekByDay.innerHTML = '';
+    for(const d of byDay){
+      const label = new Date(parseDateKey(d.key)).toLocaleDateString('es-ES', { weekday:'short' });
+      const line = document.createElement('div');
+      line.className = 'row';
+      line.style.justifyContent = 'space-between';
+      line.style.marginBottom = '8px';
+      line.innerHTML = `<div class="mini">${label} <span style="opacity:.7">(${d.key})</span></div><div style="font-family:var(--mono)">${fmtHMS(d.ms)}</div>`;
+      weekByDay.appendChild(line);
+    }
+
+    // by project breakdown
+    const rows = [...byProject.entries()].map(([pid,ms]) => ({ pid, ms })).sort((a,b)=>b.ms-a.ms);
+    weekByProject.innerHTML = '';
+    if(rows.length === 0){
+      weekByProject.innerHTML = `<div class="hint">Sin datos en esta semana.</div>`;
+      return;
+    }
+    for(const r of rows){
+      const p = getProject(r.pid);
+      const pct = totalMs > 0 ? (r.ms/totalMs)*100 : 0;
+      const wrap = document.createElement('div');
+      wrap.style.marginBottom = '10px';
+      wrap.innerHTML = `
+        <div class="row" style="justify-content:space-between; margin-bottom:6px">
+          <div class="badge">
+            <span class="swatch" style="background:${p?.color ?? 'transparent'}"></span>
+            <span>${escHtml(p?.name ?? '—')}</span>
+          </div>
+          <div style="font-family:var(--mono)">${fmtHMS(r.ms)}</div>
+        </div>
+        <div class="bar"><div style="width:${pct.toFixed(1)}%; background:${p?.color ?? '#999'}"></div></div>
+      `;
+      weekByProject.appendChild(wrap);
+    }
+  }
+
+  // ===== CSV export (Excel ES ;) =====
+  function exportCSVForDay(dayKey){
+    const d = (dayKey === selectedDayKey) ? selectedDay : loadDay(dayKey);
+    if(d.entries.length === 0){ toast('No hay entradas para exportar'); return; }
 
     const header = ['date','project','task','start_time','end_time','duration_seconds'];
-    const lines = [header.map(safeCSV).join(',')];
+    const lines = [header.map(safeCSV).join(';')];
 
-    // sort by startedAt asc for CSV readability
-    const entries = [...day.entries].sort((a,b)=>a.startedAt-b.startedAt);
+    const entries = [...d.entries].sort((a,b)=>a.startedAt-b.startedAt);
+    const nowTs = Date.now();
 
     for(const e of entries){
       const p = getProject(e.projectId);
-      const durSec = Math.floor(computeEntryDurationMs(e, nowTs)/1000);
+      const live = (dayKey === TODAY_KEY);
+      const durSec = Math.floor(computeEntryDurationMs(e, live ? nowTs : (e.endedAt ?? e.startedAt))/1000);
       const row = [
-        DAY_KEY,
+        dayKey,
         p?.name ?? '',
         e.task ?? '',
         fmtTime(e.startedAt),
         e.endedAt ? fmtTime(e.endedAt) : '',
         durSec
       ];
-      lines.push(row.map(safeCSV).join(','));
+      lines.push(row.map(safeCSV).join(';'));
     }
 
-    const csv = lines.join('\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    downloadText(`time-tracker_${dayKey}.csv`, lines.join('\n'), 'text/csv;charset=utf-8');
+    toast('CSV del día exportado');
+  }
+
+  function exportCSVForWeek(){
+    const { keys } = computeWeek();
+
+    // detail CSV
+    const header = ['date','project','task','start_time','end_time','duration_seconds'];
+    const detail = [header.map(safeCSV).join(';')];
+
+    // summary CSV
+    const sumHeader = ['week_start','week_end','project','total_seconds'];
+    const summary = [sumHeader.map(safeCSV).join(';')];
+
+    const nowTs = Date.now();
+    const totals = new Map(); // pid -> seconds
+
+    for(const k of keys){
+      const d = (k === selectedDayKey) ? selectedDay : loadDay(k);
+      const entries = [...d.entries].sort((a,b)=>a.startedAt-b.startedAt);
+
+      for(const e of entries){
+        const p = getProject(e.projectId);
+        const live = (k === TODAY_KEY);
+        const durSec = Math.floor(computeEntryDurationMs(e, live ? nowTs : (e.endedAt ?? e.startedAt))/1000);
+
+        detail.push([
+          k,
+          p?.name ?? '',
+          e.task ?? '',
+          fmtTime(e.startedAt),
+          e.endedAt ? fmtTime(e.endedAt) : '',
+          durSec
+        ].map(safeCSV).join(';'));
+
+        totals.set(e.projectId, (totals.get(e.projectId)||0) + durSec);
+      }
+    }
+
+    const weekStart = keys[0], weekEnd = keys[6];
+    const rows = [...totals.entries()]
+      .map(([pid,sec]) => ({ pid, sec }))
+      .sort((a,b)=>b.sec-a.sec);
+
+    for(const r of rows){
+      const p = getProject(r.pid);
+      summary.push([weekStart, weekEnd, p?.name ?? '', r.sec].map(safeCSV).join(';'));
+    }
+
+    downloadText(`time-tracker_week_${weekStart}_to_${weekEnd}_detail.csv`, detail.join('\n'), 'text/csv;charset=utf-8');
+    downloadText(`time-tracker_week_${weekStart}_to_${weekEnd}_summary.csv`, summary.join('\n'), 'text/csv;charset=utf-8');
+    toast('CSV semanal exportado (detalle + resumen)');
+  }
+
+  function downloadText(filename, text, mime){
+    const blob = new Blob([text], {type: mime});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `time-tracker_${DAY_KEY}.csv`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href);
-      a.remove();
-    }, 0);
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
 
-    toast('CSV exportado');
-  });
+  exportDayBtn.addEventListener('click', () => exportCSVForDay(selectedDayKey));
+  exportWeekBtn.addEventListener('click', exportCSVForWeek);
 
-  // ===== Clear day =====
-  clearBtn.addEventListener('click', () => {
-    const running = isRunning();
-    const msg = running
-      ? 'Hay una tarea activa. Si limpias el día, se perderá esa entrada también. ¿Continuar?'
-      : '¿Limpiar todos los registros del día y empezar de cero?';
+  // ===== Clear selected day =====
+  clearDayBtn.addEventListener('click', () => {
+    const msg = (selectedDayKey === TODAY_KEY && isRunning())
+      ? 'Hay una tarea activa en “Hoy”. Si limpias el día, se perderá esa entrada también. ¿Continuar?'
+      : `¿Limpiar todos los registros del día ${selectedDayKey}?`;
     if(!confirm(msg)) return;
 
-    // stop any active and clear
-    app.active = null;
-    saveApp();
-    day.entries = [];
-    saveDay();
+    if(selectedDayKey === TODAY_KEY){
+      app.active = null;
+      saveApp();
+    }
+    selectedDay.entries = [];
+    saveSelectedDay();
     renderAll();
     toast('Día limpiado');
   });
 
-  // ===== Live chrono =====
-  function tick(){
-    const ae = getActiveEntry();
-    if(ae && !ae.endedAt){
-      const ms = computeEntryDurationMs(ae, Date.now());
-      chronoEl.textContent = fmtHMS(ms);
+  // ===== Backup / Import =====
+  function getAllDayKeys(){
+    const keys = [];
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith(LS_DAY_PREFIX)){
+        keys.push(k.slice(LS_DAY_PREFIX.length));
+      }
     }
-    // Also keep summary live (includes active)
-    renderSummary();
-    requestAnimationFrame(() => {
-      // reduce frequency for lighter CPU by ticking every ~250ms
-    });
+    keys.sort();
+    return keys;
   }
 
-  let _timer = null;
+  backupBtn.addEventListener('click', () => {
+    const allKeys = getAllDayKeys();
+    const days = {};
+    for(const k of allKeys){
+      days[k] = loadDay(k);
+    }
+    const payload = {
+      schema: 'daily_time_tracker_backup_v2',
+      exportedAt: new Date().toISOString(),
+      app,
+      days
+    };
+    downloadText(`time-tracker_backup_${fmtDateKey(new Date())}.json`, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+    toast('Backup JSON descargado');
+  });
+
+  importBtn.addEventListener('click', () => importFile.click());
+
+  importFile.addEventListener('change', async () => {
+    const file = importFile.files?.[0];
+    importFile.value = '';
+    if(!file) return;
+
+    try{
+      const text = await file.text();
+      const payload = JSON.parse(text);
+
+      if(!payload || payload.schema !== 'daily_time_tracker_backup_v2'){
+        toast('Backup inválido (schema no reconocido)');
+        return;
+      }
+
+      const mode = confirm('¿Desea SOBREESCRIBIR todo (app + días)?\n\nAceptar = sobrescribe.\nCancelar = fusiona (mantiene lo existente y añade lo faltante).')
+        ? 'overwrite'
+        : 'merge';
+
+      if(mode === 'overwrite'){
+        // Remove existing day keys
+        for(const k of getAllDayKeys()){
+          localStorage.removeItem(LS_DAY_PREFIX + k);
+        }
+        // Write new
+        if(payload.app){
+          app = payload.app;
+          saveApp();
+        }
+        if(payload.days){
+          for(const [k, d] of Object.entries(payload.days)){
+            localStorage.setItem(LS_DAY_PREFIX + k, JSON.stringify(d));
+          }
+        }
+      } else {
+        // merge
+        if(payload.app?.projects?.length){
+          // merge projects by id; if collision, keep local name/color
+          const localById = new Map(app.projects.map(p => [p.id, p]));
+          for(const p of payload.app.projects){
+            if(!localById.has(p.id)){
+              app.projects.push(p);
+              localById.set(p.id, p);
+            }
+          }
+          // keep local lastColorIndex but ensure it exists
+          if(typeof app.lastColorIndex !== 'number') app.lastColorIndex = 0;
+          saveApp();
+        }
+        if(payload.days){
+          for(const [k, d] of Object.entries(payload.days)){
+            const existing = localStorage.getItem(LS_DAY_PREFIX + k);
+            if(!existing){
+              localStorage.setItem(LS_DAY_PREFIX + k, JSON.stringify(d));
+            } else {
+              // merge entries by id
+              const cur = loadDay(k);
+              const curIds = new Set(cur.entries.map(e => e.id));
+              for(const e of (d.entries || [])){
+                if(!curIds.has(e.id)) cur.entries.push(e);
+              }
+              localStorage.setItem(LS_DAY_PREFIX + k, JSON.stringify(cur));
+            }
+          }
+        }
+      }
+
+      // reconcile active
+      if(app.active){
+        const ae = getActiveEntry();
+        if(!ae || ae.endedAt){
+          app.active = null;
+          saveApp();
+        }
+      }
+
+      // refresh selection
+      setSelectedDay(selectedDayKey);
+      toast('Import realizado');
+    }catch(err){
+      toast('No se pudo importar (JSON inválido)');
+    }
+  });
+
+  // ===== Live chrono ticker =====
   function startTicker(){
-    if(_timer) clearInterval(_timer);
-    _timer = setInterval(() => {
+    setInterval(() => {
       const ae = getActiveEntry();
       if(ae && !ae.endedAt){
         const ms = computeEntryDurationMs(ae, Date.now());
         chronoEl.textContent = fmtHMS(ms);
       }
-      renderSummary();
+      // keep summaries live
+      renderDaySummary();
+      renderWeek();
     }, 250);
   }
 
   // ===== Render all =====
   function renderAll(){
+    dayKeyBadge.textContent = `Día: ${selectedDayKey}`;
     renderProjects();
     renderEntries();
     renderActive();
-    renderSummary();
+    renderDaySummary();
+    renderWeek();
   }
 
-  // ===== Reconcile: if active refers to missing entry, clear it =====
-  if(app.active && !getActiveEntry()){
-    app.active = null;
-    saveApp();
-  }
-  // if active exists but endedAt set (e.g. after refresh), clear active
-  const ae = getActiveEntry();
-  if(ae && ae.endedAt){
-    app.active = null;
-    saveApp();
+  // ===== Init selected day picker =====
+  dayPicker.value = selectedDayKey;
+
+  // reconcile active on load
+  if(app.active){
+    const ae = getActiveEntry();
+    if(!ae || ae.endedAt){
+      app.active = null;
+      saveApp();
+    }
   }
 
-  renderAll();
+  // initial render
+  setSelectedDay(TODAY_KEY);
   startTicker();
-
-  // ===== Nice defaults =====
-  // Focus task input when selecting project
-  projectSelect.addEventListener('change', () => taskInput.focus());
-
 })();
 </script>
 </body>
